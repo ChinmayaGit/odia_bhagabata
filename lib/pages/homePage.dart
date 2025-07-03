@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:odia_bhagabata/global.dart';
 import 'package:odia_bhagabata/pages/chapterPage.dart';
 import 'package:odia_bhagabata/pages/sectionPage.dart';
+import 'package:odia_bhagabata/pages/settingsPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 
@@ -56,80 +57,132 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text("ଶ୍ରୀମଦ୍ଭାଗବତ"),
-          centerTitle: true,
-          actions: [
-            IconButton(
-              icon: Icon(Icons.brightness_6),
-              onPressed: widget.toggleTheme,
-            ),
-          ],
-        ),
-        body: GridView.builder(
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2, // Number of columns
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-            childAspectRatio: 2, // Aspect ratio for the grid items
+      appBar: AppBar(
+        title: const Text("ଶ୍ରୀମଦ୍ଭାଗବତ"),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.brightness_6),
+            onPressed: widget.toggleTheme,
           ),
-          padding: EdgeInsets.all(10),
-          itemCount: chapters.length,
-          itemBuilder: (context, index) {
-            Chapter chapter = chapters[index];
-            return Card(
-              elevation: 5,
-              child: InkWell(
-                onTap: () => _navigateToChapter(chapter),
-                child: Padding(
-                  padding: const EdgeInsets.all(18.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        'ଶ୍ରୀମଦ୍ଭାଗବତ',
-                        textAlign: TextAlign.center,
-                        style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          IconButton(
+            icon: Icon(Icons.settings),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SettingsPage()),
+              ).then((_) {
+                setState(() {}); // 👈 This rebuilds HomePage when SettingsPage pops
+              });
+            },
+          ),
+        ],
+      ),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          GridView.builder(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+              childAspectRatio: showCover ? 0.6 : 1.5, // 👈 dynamic!
+            ),
+            padding: EdgeInsets.all(10),
+            itemCount: chapters.length,
+            itemBuilder: (context, index) {
+              Chapter chapter = chapters[index];
+              return Card(
+                elevation: 5,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: InkWell(
+                  onTap: () => _navigateToChapter(chapter),
+                  child: Container(
+                    decoration: showCover
+                        ? BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage('assets/booklit.png'),
+                        fit: BoxFit.cover,
                       ),
-                      Text(
-                        chapter.title,
-                        textAlign: TextAlign.center,
-                        style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    )
+                        : null,
+                    child: Padding(
+                      padding: const EdgeInsets.all(18.0),
+                      child: Center( // ✅ wrap in Center for safe fitting
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min, // ✅ Let Column size itself
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Flexible(
+                              child: Text(
+                                'ଶ୍ରୀମଦ୍ଭାଗବତ',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: showCover ? Colors.white : null, // null = use theme color
+
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 8), // space between
+                            Flexible(
+                              child: Text(
+                                chapter.title,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: showCover ? Colors.white : null, // null = use theme color
+
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ],
+                    ),
                   ),
                 ),
-              ),
-            );
-          },
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-        floatingActionButton: lastSectionTitle != null
-            ? FloatingActionButton.extended(
-          onPressed: () async {
-            SharedPreferences prefs = await SharedPreferences.getInstance();
-            String? sectionTitle = prefs.getString('lastSectionTitle');
-            Section? lastSection;
-            for (var chapter in chapters) {
-              for (var section in chapter.sections) {
-                if (section.title == sectionTitle) {
-                  lastSection = section;
-                  break;
-                }
+              );
+
+            },
+          ),
+
+        ],
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: lastSectionTitle != null
+          ? FloatingActionButton.extended(
+        onPressed: () async {
+          SharedPreferences prefs =
+          await SharedPreferences.getInstance();
+          String? sectionTitle = prefs.getString('lastSectionTitle');
+          Section? lastSection;
+          for (var chapter in chapters) {
+            for (var section in chapter.sections) {
+              if (section.title == sectionTitle) {
+                lastSection = section;
+                break;
               }
             }
-            if (lastSection != null) {
-              _navigateToSection(lastSection);
-            }
-          },
-          label: Text("ପୂର୍ବରୁ"),
-          icon: Icon(Icons.bookmark),
-        )
-            : Container()
+          }
+          if (lastSection != null) {
+            _navigateToSection(lastSection);
+          }
+        },
+        label: Text("ପୂର୍ବରୁ"),
+        icon: Icon(Icons.bookmark),
+      )
+          : Container(),
     );
   }
+
 }

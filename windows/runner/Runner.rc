@@ -93,7 +93,7 @@ BEGIN
             VALUE "FileDescription", "odia_bhagabata" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "odia_bhagabata" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2024 com.chinu. All rights reserved." "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2025 com.chinu. All rights reserved." "\0"
             VALUE "OriginalFilename", "odia_bhagabata.exe" "\0"
             VALUE "ProductName", "odia_bhagabata" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"

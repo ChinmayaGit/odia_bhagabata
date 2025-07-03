@@ -14,13 +14,21 @@ import 'package:odia_bhagabata/book/section_12.dart';
 import 'package:odia_bhagabata/book/section_13.dart';
 
 bool isDarkMode = true;
+double globalZoom = 1.0;
+bool showCover = true;
 
 class Section {
   final String title;
   final String content;
-  bool isRead;
-  Section({required this.title,this.isRead = false, required this.content});
+  final String? spokenText; // ✅ Add this field
+
+  Section({
+    required this.title,
+    required this.content,
+    this.spokenText, // ✅ Make it optional
+  });
 }
+
 
 class Chapter {
   final String title;
